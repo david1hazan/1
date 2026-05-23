@@ -1,0 +1,555 @@
+<!DOCTYPE html><html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>חיפוש אתרים מאושרים</title>
+  <style>
+    :root {
+      --text: #202124;
+      --muted: #5f6368;
+      --border: #dfe1e5;
+      --blue: #1a0dab;
+      --green: #188038;
+      --bg: #ffffff;
+      --soft-bg: #f8fafd;
+      --danger: #b3261e;
+    }* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  font-family: Arial, Helvetica, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+}
+
+.page {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+header {
+  height: 64px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  padding: 0 24px;
+  color: var(--muted);
+  font-size: 14px;
+}
+
+.home {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 90px 20px 40px;
+}
+
+.logo {
+  direction: ltr;
+  user-select: none;
+  font-size: clamp(56px, 12vw, 92px);
+  font-weight: 500;
+  letter-spacing: -7px;
+  line-height: 1;
+  margin-bottom: 34px;
+}
+
+.logo span:nth-child(1),
+.logo span:nth-child(4) { color: #4285f4; }
+.logo span:nth-child(2),
+.logo span:nth-child(6) { color: #ea4335; }
+.logo span:nth-child(3) { color: #fbbc05; }
+.logo span:nth-child(5) { color: #34a853; }
+
+.search-area {
+  width: min(584px, 100%);
+}
+
+.search-box {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  min-height: 48px;
+  border: 1px solid var(--border);
+  border-radius: 24px;
+  padding: 0 18px;
+  background: #fff;
+  transition: box-shadow 0.18s ease, border-color 0.18s ease;
+}
+
+.search-box:hover,
+.search-box:focus-within {
+  border-color: transparent;
+  box-shadow: 0 1px 6px rgba(32, 33, 36, 0.28);
+}
+
+.search-icon {
+  color: #9aa0a6;
+  font-size: 18px;
+  transform: rotate(-10deg);
+}
+
+input {
+  flex: 1;
+  border: none;
+  outline: none;
+  font-size: 16px;
+  color: var(--text);
+  background: transparent;
+  direction: rtl;
+}
+
+.buttons {
+  margin-top: 28px;
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+button {
+  border: 1px solid #f8f9fa;
+  border-radius: 4px;
+  background: #f8f9fa;
+  color: #3c4043;
+  font-size: 14px;
+  padding: 10px 18px;
+  cursor: pointer;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+button:hover {
+  border-color: #dadce0;
+  box-shadow: 0 1px 1px rgba(0, 0, 0, 0.08);
+}
+
+.status {
+  margin-top: 24px;
+  min-height: 24px;
+  text-align: center;
+  color: var(--muted);
+  font-size: 14px;
+}
+
+.results-page {
+  display: none;
+  padding-bottom: 50px;
+}
+
+.results-header {
+  display: grid;
+  grid-template-columns: auto minmax(220px, 692px) 1fr;
+  align-items: center;
+  gap: 28px;
+  padding: 22px 34px 18px;
+  border-bottom: 1px solid #ebebeb;
+  direction: ltr;
+}
+
+.mini-logo {
+  direction: ltr;
+  cursor: pointer;
+  font-size: 30px;
+  font-weight: 500;
+  letter-spacing: -2px;
+  white-space: nowrap;
+}
+
+.mini-logo span:nth-child(1),
+.mini-logo span:nth-child(4) { color: #4285f4; }
+.mini-logo span:nth-child(2),
+.mini-logo span:nth-child(6) { color: #ea4335; }
+.mini-logo span:nth-child(3) { color: #fbbc05; }
+.mini-logo span:nth-child(5) { color: #34a853; }
+
+.results-header .search-box {
+  direction: rtl;
+  max-width: 692px;
+  min-height: 46px;
+}
+
+.results-wrap {
+  max-width: 720px;
+  margin: 18px auto 0;
+  padding: 0 24px;
+  direction: rtl;
+}
+
+.count {
+  color: var(--muted);
+  font-size: 14px;
+  margin-bottom: 22px;
+}
+
+.result-card {
+  margin: 0 0 28px;
+  padding: 2px 0;
+}
+
+.site-line {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 6px;
+  color: var(--text);
+  font-size: 14px;
+}
+
+.favicon {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: #f1f3f4;
+  display: grid;
+  place-items: center;
+  font-weight: 700;
+  color: #5f6368;
+  flex: none;
+}
+
+.url {
+  color: #4d5156;
+  direction: ltr;
+  unicode-bidi: embed;
+  font-size: 13px;
+}
+
+.result-title {
+  color: var(--blue);
+  font-size: 20px;
+  line-height: 1.3;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.result-title:hover {
+  text-decoration: underline;
+}
+
+.snippet {
+  margin-top: 6px;
+  color: #4d5156;
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+.empty {
+  max-width: 620px;
+  margin: 44px auto 0;
+  padding: 30px 26px;
+  border: 1px solid #f0d1cf;
+  border-radius: 18px;
+  background: #fff7f6;
+  color: var(--danger);
+  text-align: center;
+  box-shadow: 0 8px 24px rgba(179, 38, 30, 0.08);
+}
+
+.empty strong {
+  display: block;
+  font-size: 22px;
+  margin-bottom: 8px;
+}
+
+.empty p {
+  margin: 0;
+  color: #5f6368;
+  line-height: 1.7;
+}
+
+.hidden {
+  display: none !important;
+}
+
+@media (max-width: 720px) {
+  .home {
+    padding-top: 70px;
+  }
+
+  .results-header {
+    grid-template-columns: 1fr;
+    gap: 14px;
+    padding: 18px 16px;
+  }
+
+  .mini-logo {
+    text-align: center;
+  }
+
+  .results-wrap {
+    margin-top: 16px;
+    padding: 0 18px;
+  }
+}
+
+  </style>
+</head>
+<body>
+  <main class="page">
+    <section id="homePage" class="home">
+      <div class="logo" aria-label="Approved Search">
+        <span>A</span><span>p</span><span>p</span><span>r</span><span>o</span><span>v</span>
+      </div><form id="homeForm" class="search-area">
+    <label class="search-box" aria-label="חיפוש אתר מאושר">
+      <span class="search-icon">⌕</span>
+      <input id="homeInput" type="search" autocomplete="off" placeholder="חפש אתר מאושר" />
+    </label>
+    <div class="buttons">
+      <button type="submit">חיפוש</button>
+      <button type="button" id="showAllBtn">הצג אתרים מאושרים</button>
+    </div>
+    <div id="homeStatus" class="status">טוען רשימת אתרים מאושרים...</div>
+  </form>
+</section>
+
+<section id="resultsPage" class="results-page">
+  <div class="results-header">
+    <div class="mini-logo" id="backHome" title="חזרה לדף הבית">
+      <span>A</span><span>p</span><span>p</span><span>r</span><span>o</span><span>v</span>
+    </div>
+
+    <form id="resultsForm">
+      <label class="search-box" aria-label="חיפוש אתר מאושר">
+        <span class="search-icon">⌕</span>
+        <input id="resultsInput" type="search" autocomplete="off" placeholder="חפש אתר מאושר" />
+      </label>
+    </form>
+  </div>
+
+  <div class="results-wrap">
+    <div id="count" class="count"></div>
+    <div id="results"></div>
+  </div>
+</section>
+
+  </main>  <script>
+    /************************************************************
+     * הגדרה חשובה:
+     * החלף את הכתובת הבאה לכתובת קובץ הטקסט בשרת שלך.
+     * דוגמה לקובץ:
+     * google.com
+     * wikipedia.org
+     * https://example.com
+     * ynet.co.il
+     ************************************************************/
+    const DOMAINS_FILE_URL = "https://github.com/F22proApp/F22proApp/raw/refs/heads/main/hosts.txt";
+
+    let approvedSites = [];
+    let loaded = false;
+
+    const homePage = document.getElementById("homePage");
+    const resultsPage = document.getElementById("resultsPage");
+    const homeForm = document.getElementById("homeForm");
+    const resultsForm = document.getElementById("resultsForm");
+    const homeInput = document.getElementById("homeInput");
+    const resultsInput = document.getElementById("resultsInput");
+    const resultsEl = document.getElementById("results");
+    const countEl = document.getElementById("count");
+    const homeStatus = document.getElementById("homeStatus");
+    const backHome = document.getElementById("backHome");
+    const showAllBtn = document.getElementById("showAllBtn");
+
+    async function loadApprovedDomains() {
+      try {
+        const response = await fetch(DOMAINS_FILE_URL, { cache: "no-store" });
+
+        if (!response.ok) {
+          throw new Error("לא ניתן לקרוא את קובץ הדומיינים");
+        }
+
+        const text = await response.text();
+
+        approvedSites = text
+          .split(/
+?
+/)
+          .map(extractDomainFromLine)
+          .filter(Boolean)
+          .map(normalizeSite)
+          .filter(Boolean);
+
+        loaded = true;
+        homeStatus.textContent = `נטענו ${approvedSites.length} אתרים מאושרים`;
+      } catch (error) {
+        console.error(error);
+        homeStatus.textContent = "שגיאה בטעינת רשימת האתרים. בדוק את כתובת הקובץ והרשאות CORS.";
+        homeStatus.style.color = "#b3261e";
+      }
+    }
+
+    function extractDomainFromLine(line) {
+      const cleanLine = line.trim();
+
+      if (!cleanLine || cleanLine.startsWith("#")) return null;
+
+      const withoutComment = cleanLine.split("#")[0].trim();
+      const parts = withoutComment.split(/\s+/).filter(Boolean);
+
+      if (!parts.length) return null;
+
+      // תמיכה בשורות hosts, למשל:
+      // 0.0.0.0 example.com
+      // 127.0.0.1 www.example.com
+      if (parts.length >= 2 && /^(0\.0\.0\.0|127\.0\.0\.1|::1)$/i.test(parts[0])) {
+        return parts[1];
+      }
+
+      // תמיכה בשורות רגילות, למשל:
+      // example.com
+      // https://example.com
+      return parts[0];
+    }
+
+    function normalizeSite(rawValue) {
+      try {
+        let value = rawValue.trim();
+
+        if (!value) return null;
+
+        if (!/^https?:\/\//i.test(value)) {
+          value = "https://" + value;
+        }
+
+        const url = new URL(value);
+        const hostname = url.hostname.replace(/^www\./i, "").toLowerCase();
+
+        return {
+          domain: hostname,
+          title: hostname,
+          url: `${url.protocol}//${hostname}`,
+          displayUrl: hostname
+        };
+      } catch {
+        return null;
+      }
+    }
+
+    function normalizeQuery(query) {
+      return query
+        .trim()
+        .toLowerCase()
+        .replace(/^https?:\/\//i, "")
+        .replace(/^www\./i, "")
+        .replace(/\/.*$/, "");
+    }
+
+    function searchSites(query) {
+      const cleanQuery = normalizeQuery(query);
+
+      if (!cleanQuery) return [];
+
+      return approvedSites.filter(site => {
+        return site.domain.includes(cleanQuery) || cleanQuery.includes(site.domain);
+      });
+    }
+
+    function showResultsPage(query = "") {
+      homePage.style.display = "none";
+      resultsPage.style.display = "block";
+      resultsInput.value = query;
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    function showHomePage() {
+      resultsPage.style.display = "none";
+      homePage.style.display = "flex";
+      homeInput.focus();
+    }
+
+    function renderResults(query, matches) {
+      showResultsPage(query);
+      resultsEl.innerHTML = "";
+
+      if (!loaded) {
+        countEl.textContent = "רשימת האתרים עדיין לא נטענה";
+        resultsEl.innerHTML = createEmptyMessage("הרשימה עדיין נטענת", "נסה שוב בעוד רגע.");
+        return;
+      }
+
+      if (!matches.length) {
+        countEl.textContent = "לא נמצאו תוצאות";
+        resultsEl.innerHTML = createEmptyMessage(
+          "לא נמצא אתר מאושר",
+          "האתר שחיפשת אינו מופיע ברשימת הדומיינים המאושרים."
+        );
+        return;
+      }
+
+      countEl.textContent = `נמצאו ${matches.length} תוצאות מאושרות`;
+
+      const html = matches.map(site => `
+        <article class="result-card">
+          <div class="site-line">
+            <div class="favicon">${escapeHtml(site.domain.charAt(0).toUpperCase())}</div>
+            <div>
+              <div>${escapeHtml(site.title)}</div>
+              <div class="url">${escapeHtml(site.displayUrl)}</div>
+            </div>
+          </div>
+          <a class="result-title" href="${escapeAttribute(site.url)}" target="_blank" rel="noopener noreferrer">
+            ${escapeHtml(site.title)}
+          </a>
+          <div class="snippet">
+            אתר זה נמצא ברשימת האתרים המאושרים. לחיצה על התוצאה תפתח את הדף הראשי של האתר.
+          </div>
+        </article>
+      `).join("");
+
+      resultsEl.innerHTML = html;
+    }
+
+    function createEmptyMessage(title, message) {
+      return `
+        <div class="empty">
+          <strong>${escapeHtml(title)}</strong>
+          <p>${escapeHtml(message)}</p>
+        </div>
+      `;
+    }
+
+    function handleSearch(query) {
+      const matches = searchSites(query);
+      renderResults(query, matches);
+    }
+
+    function showAllSites() {
+      showResultsPage("");
+      renderResults("", approvedSites);
+    }
+
+    function escapeHtml(value) {
+      return String(value)
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+    }
+
+    function escapeAttribute(value) {
+      return escapeHtml(value);
+    }
+
+    homeForm.addEventListener("submit", event => {
+      event.preventDefault();
+      handleSearch(homeInput.value);
+    });
+
+    resultsForm.addEventListener("submit", event => {
+      event.preventDefault();
+      handleSearch(resultsInput.value);
+    });
+
+    backHome.addEventListener("click", showHomePage);
+
+    showAllBtn.addEventListener("click", showAllSites);
+
+    loadApprovedDomains();
+  </script></body>
+</html>
